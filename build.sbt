@@ -1,5 +1,5 @@
-lazy val Scala212 = "2.12.12"
-lazy val Scala213 = "2.13.8"
+lazy val Scala212 = "2.12.13"
+lazy val Scala213 = "2.13.10"
 lazy val Scala3 = "3.1.1"
 lazy val allCrossVersions = Seq(Scala212, Scala213, Scala3)
 
@@ -47,7 +47,7 @@ lazy val core = (project in file("./modules/core"))
     name := "testcontainers-scala-kafka-utils-core",
     (publish / skip) := false,
     Release.settings,
-    libraryDependencies ++= Dependencies.testDeps
+    libraryDependencies ++= (Dependencies.coreDeps ++ Dependencies.testDeps)
   )
 
 lazy val root = project
@@ -61,7 +61,7 @@ lazy val root = project
 inThisBuild(
   List(
     organization := "com.bbrownsound",
-    homepage := Some(url("https://github.com/brbrown25/macros")),
+    homepage := Some(url("https://github.com/brbrown25/testcontainers-scala-kafka-utils")),
     licenses := List("MIT" -> url("https://github.com/brbrown25/testcontainers-scala-kafka-utils/blob/main/LICENSE")),
     developers := List(
       Developer(
@@ -71,7 +71,7 @@ inThisBuild(
         url("https://bbrownsound.com")
       )
     ),
-    semanticdbEnabled := true, // enable SemanticDB
+    semanticdbEnabled := false, // enable SemanticDB
     semanticdbVersion := scalafixSemanticdb.revision, // use Scalafix compatible version
     scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value),
     scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"

@@ -2,11 +2,11 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val cats = "2.7.0"
-    val catsEffect = "3.3.5"
+    val cats = "2.8.0"
+    val catsEffect = "3.3.14"
     val fs2 = "3.2.4"
-    val fs2Kafka = "2.3.0"
-    val kafkaClients = "3.1.0"
+    val fs2Kafka = "2.5.0"
+    val kafkaClients = "3.3.1"
     val munit = "0.7.29"
     val munitCatsEffect = "1.0.7"
     val slf4j = "1.7.35"
@@ -28,11 +28,19 @@ object Dependencies {
   lazy val testcontainersKafka = "com.dimafeng" %% "testcontainers-scala-kafka" % Versions.testcontainers
   lazy val testcontainersMunit = "com.dimafeng" %% "testcontainers-scala-munit" % Versions.testcontainers
 
+  lazy val coreDeps = Seq(
+    catsCore,
+    catsEffect,
+    fs2Core,
+    fs2Kafka,
+    kafkaClients,
+    munit
+  )
+
   lazy val testDeps = Seq(
-    munit,
     munitCatsEffect,
     munitScalaCheck,
     testcontainersKafka,
-    testcontainersMunit,
+    testcontainersMunit
   ).map(_ % "test,it")
 }
