@@ -21,7 +21,7 @@ object Dependencies {
   lazy val fs2Core = "co.fs2" %% "fs2-core" % Versions.fs2
   lazy val fs2Kafka = "com.github.fd4s" %% "fs2-kafka" % Versions.fs2Kafka
   lazy val kafkaClients = "org.apache.kafka" % "kafka-clients" % Versions.kafkaClients
-  lazy val munit = "org.scalameta" %% "munit" % Versions.munit % Test
+  lazy val munit = "org.scalameta" %% "munit" % Versions.munit
   lazy val munitCatsEffect = "org.typelevel" %% "munit-cats-effect-3" % Versions.munitCatsEffect
   lazy val munitScalaCheck = "org.scalameta" %% "munit-scalacheck" % Versions.munit
   lazy val slf4jApi = "org.slf4j" % "slf4j-api" % Versions.slf4j
