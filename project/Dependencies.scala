@@ -10,7 +10,7 @@ object Dependencies {
     val munit = "0.7.29"
     val munitCatsEffect = "1.0.7"
     val slf4j = "1.7.35"
-    val testcontainers = "0.40.4"
+    val testcontainers = "0.40.12"
   }
 
   lazy val catsCore = "org.typelevel" %% "cats-core" % Versions.cats
