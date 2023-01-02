@@ -3,12 +3,11 @@ package com.bbrownsound.kafka.ops
 import cats.Applicative
 import cats.effect._
 import cats.syntax.all._
-import com.bbrownsound.kafka.types._
 import fs2.kafka._
 
-/**
- * Wraps the producer ops an runs them using the provided IO runtime
- */
+import com.bbrownsound.kafka.types._
+
+/** Wraps the producer ops an runs them using the provided IO runtime */
 trait UnsafeProducerOps extends ProducerOps {
 
   /**
@@ -19,11 +18,10 @@ trait UnsafeProducerOps extends ProducerOps {
    * @param runtime
    */
   def unsafePublishStringMessageToKafka(
-      topic: String,
-      message: String
-  )(implicit config: C, runtime: unsafe.IORuntime): Unit = {
+    topic: String,
+    message: String
+  )(implicit config: C, runtime: unsafe.IORuntime): Unit =
     publishStringMessageToKafka[IO](topic, message).unsafeRunSync()
-  }
 
   /**
    * Produce a keyed message to the provided topic
@@ -38,10 +36,10 @@ trait UnsafeProducerOps extends ProducerOps {
    * @tparam V
    */
   def unsafePublishToKafka[K, V](topic: String, key: K, message: V)(
-      implicit config: C,
-      keySerializer: Serializer[IO, K],
-      serializer: Serializer[IO, V],
-      runtime: unsafe.IORuntime
+    implicit config: C,
+    keySerializer: Serializer[IO, K],
+    serializer: Serializer[IO, V],
+    runtime: unsafe.IORuntime
   ): Unit = publishToKafka[IO, K, V](topic, key, message).unsafeRunSync()
 
   /**
@@ -56,10 +54,10 @@ trait UnsafeProducerOps extends ProducerOps {
    * @tparam V
    */
   def unsafePublishToKafka[K, V](topic: String, messages: Seq[(K, V)])(
-      implicit config: C,
-      keySerializer: Serializer[IO, K],
-      serializer: Serializer[IO, V],
-      runtime: unsafe.IORuntime
+    implicit config: C,
+    keySerializer: Serializer[IO, K],
+    serializer: Serializer[IO, V],
+    runtime: unsafe.IORuntime
   ): Unit = publishToKafka[IO, K, V](topic, messages).unsafeRunSync()
 
   /**
@@ -75,10 +73,10 @@ trait UnsafeProducerOps extends ProducerOps {
    * @return
    */
   def unsafeWithProducer[K, V, T](body: KafkaProducer.Metrics[IO, K, V] => T)(
-      implicit config: C,
-      keySerializer: Serializer[IO, K],
-      valueSerializer: Serializer[IO, V],
-      runtime: unsafe.IORuntime
+    implicit config: C,
+    keySerializer: Serializer[IO, K],
+    valueSerializer: Serializer[IO, V],
+    runtime: unsafe.IORuntime
   ): T = withProducer[IO, K, V, T](body).unsafeRunSync()
 }
 
@@ -92,9 +90,8 @@ trait ProducerOps {
    * @tparam F
    * @return
    */
-  def publishStringMessageToKafka[F[_]: Async](topic: String, message: String)(implicit config: C): F[Unit] = {
+  def publishStringMessageToKafka[F[_]: Async](topic: String, message: String)(implicit config: C): F[Unit] =
     publishToKafka[F, String, String](topic, "", message)
-  }
 
   /**
    * Produce a keyed message to the specified topic
@@ -110,12 +107,11 @@ trait ProducerOps {
    * @return
    */
   def publishToKafka[F[_]: Applicative: Async, K, V](topic: String, key: K, message: V)(
-      implicit config: C,
-      keySerializer: Serializer[F, K],
-      serializer: Serializer[F, V]
-  ): F[Unit] = {
+    implicit config: C,
+    keySerializer: Serializer[F, K],
+    serializer: Serializer[F, V]
+  ): F[Unit] =
     publishToKafka(topic, Seq((key, message)))
-  }
 
   /**
    * Given a producer record, produce to a topic
@@ -127,7 +123,7 @@ trait ProducerOps {
    * @return
    */
   def publishToKafka[F[_]: Async, V](
-      producerRecord: ProducerRecord[String, V]
+    producerRecord: ProducerRecord[String, V]
   )(implicit config: C, serializer: Serializer[F, V]): F[Unit] = {
     val settings: ProducerSettings[F, String, V] = ProducerSettings(
       keySerializer = Serializer[F, String],
@@ -152,9 +148,9 @@ trait ProducerOps {
    * @return
    */
   def publishToKafka[F[_]: Applicative: Async, K, V](topic: String, messages: Seq[(K, V)])(
-      implicit config: C,
-      keySerializer: Serializer[F, K],
-      serializer: Serializer[F, V]
+    implicit config: C,
+    keySerializer: Serializer[F, K],
+    serializer: Serializer[F, V]
   ): F[Unit] = {
     val settings: ProducerSettings[F, K, V] = ProducerSettings(
       keySerializer = Serializer[F, K],
@@ -183,9 +179,9 @@ trait ProducerOps {
    * @return
    */
   def withProducer[F[_]: Applicative: Async, K, V, T](body: KafkaProducer.Metrics[F, K, V] => T)(
-      implicit config: C,
-      keySerializer: Serializer[F, K],
-      valueSerializer: Serializer[F, V]
+    implicit config: C,
+    keySerializer: Serializer[F, K],
+    valueSerializer: Serializer[F, V]
   ): F[T] = {
     val settings = ProducerSettings(
       keySerializer = keySerializer,
@@ -204,12 +200,11 @@ trait ProducerOps {
    * @return
    */
   private def publishToKafka[F[_]: Async, K, V](
-      kafkaProducer: fs2.Stream[F, KafkaProducer.Metrics[F, K, V]],
-      records: ProducerRecords[Unit, K, V]
-  ): F[Unit] = {
+    kafkaProducer: fs2.Stream[F, KafkaProducer.Metrics[F, K, V]],
+    records: ProducerRecords[Unit, K, V]
+  ): F[Unit] =
     kafkaProducer
-      .evalMap { producer => producer.produce(records).flatten }
+      .evalMap(producer => producer.produce(records).flatten)
       .compile
       .drain
-  }
 }

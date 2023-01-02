@@ -1,6 +1,6 @@
-lazy val Scala212 = "2.12.13"
-lazy val Scala213 = "2.13.10"
-lazy val Scala3 = "3.1.1"
+lazy val Scala212         = "2.12.13"
+lazy val Scala213         = "2.13.10"
+lazy val Scala3           = "3.1.1"
 lazy val allCrossVersions = Seq(Scala212, Scala213, Scala3)
 
 ThisBuild / organization := "com.bbrownsound"
@@ -9,26 +9,27 @@ ThisBuild / crossScalaVersions := allCrossVersions
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-// def adopt(version: String): JavaSpec = JavaSpec(JavaSpec.Distribution.Adopt, version)
+def adopt(version: String): JavaSpec = JavaSpec(JavaSpec.Distribution.Adopt, version)
 
-// ThisBuild / githubWorkflowJavaVersions := Seq(adopt("8"), adopt("11"), adopt("15"))
-// ThisBuild / githubWorkflowArtifactUpload := false
-// ThisBuild / githubWorkflowAddedJobs ++= Seq(
-//   WorkflowJob(
-//     "formatting",
-//     "Check formatting",
-//     githubWorkflowJobSetup.value.toList ::: List(
-//       WorkflowStep
-//         .Run(List(s"sbt ++${crossScalaVersions.value.last} checkAll"), name = Some("Check formatting"))
-//     )
-//   )
-// )
-// ThisBuild / githubWorkflowPublishTargetBranches :=
-//   Seq(
-//     RefPredicate.StartsWith(Ref.Tag("*")),
-//     RefPredicate.Contains(Ref.Branch("master")),
-//     RefPredicate.Contains(Ref.Branch("main"))
-//   )
+ThisBuild / githubWorkflowJavaVersions := Seq(adopt("8"), adopt("11"), adopt("17"))
+ThisBuild / githubWorkflowArtifactUpload := false
+ThisBuild / githubWorkflowAddedJobs ++= Seq(
+  WorkflowJob(
+    "formatting",
+    "Check formatting",
+    githubWorkflowJobSetup.value.toList ::: List(
+      // do to some quirks with scalafix and scala3 use scala 2.13 for the formatting
+      WorkflowStep
+        .Run(List(s"sbt ++$Scala213 checkAll"), name = Some("Check formatting"))
+    )
+  )
+)
+ThisBuild / githubWorkflowPublishTargetBranches :=
+  Seq(
+    RefPredicate.StartsWith(Ref.Tag("*")),
+    RefPredicate.Contains(Ref.Branch("master")),
+    RefPredicate.Contains(Ref.Branch("main"))
+  )
 
 // ThisBuild / githubWorkflowPublish := Seq(
 //   WorkflowStep.Sbt(
@@ -71,10 +72,11 @@ inThisBuild(
         url("https://bbrownsound.com")
       )
     ),
-    semanticdbEnabled := false, // enable SemanticDB
+    semanticdbEnabled := true, // enable SemanticDB
     semanticdbVersion := scalafixSemanticdb.revision, // use Scalafix compatible version
     scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value),
-    scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
+    scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
+    scalacOptions ++= Seq("-Ywarn-unused")
   )
 )
 
