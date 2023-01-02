@@ -1,6 +1,6 @@
-lazy val Scala212         = "2.12.13"
+lazy val Scala212         = "2.12.17"
 lazy val Scala213         = "2.13.10"
-lazy val Scala3           = "3.1.1"
+lazy val Scala3           = "3.2.1"
 lazy val allCrossVersions = Seq(Scala212, Scala213, Scala3)
 
 ThisBuild / organization := "com.bbrownsound"
@@ -76,7 +76,7 @@ inThisBuild(
     semanticdbVersion := scalafixSemanticdb.revision, // use Scalafix compatible version
     scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value),
     scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
-    scalacOptions ++= Seq("-Ywarn-unused")
+    scalacOptions ++= Seq("-Wconf:origin=scala.collection.compat.*:s", "-Ywarn-unused")
   )
 )
 

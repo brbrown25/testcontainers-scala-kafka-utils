@@ -1,11 +1,10 @@
 package com.bbrownsound.kafka.ops
 
-import cats.Applicative
 import cats.effect._
 import fs2.kafka._
 import org.apache.kafka.clients.admin.NewTopic
 
-import scala.jdk.CollectionConverters.MapHasAsJava
+import scala.jdk.CollectionConverters._
 
 import com.bbrownsound.kafka.types._
 
@@ -34,7 +33,7 @@ trait UnsafeAdminOps extends AdminOps {
 }
 
 trait AdminOps {
-  def createCustomTopics[F[_]: Applicative: Async](
+  def createCustomTopics[F[_]: Async](
     topics: List[String],
     topicConfig: Map[String, String] = Map.empty,
     partitions: Int = 1,
@@ -45,7 +44,7 @@ trait AdminOps {
       adminClient.createTopics(newTopics)
     }
 
-  def createCustomTopic[F[_]: Applicative: Async](
+  def createCustomTopic[F[_]: Async](
     topic: String,
     topicConfig: Map[String, String] = Map.empty,
     partitions: Int = 1,
@@ -56,13 +55,13 @@ trait AdminOps {
       adminClient.createTopic(newTopic)
     }
 
-  def deleteTopic[F[_]: Applicative: Async](topic: String)(implicit config: C): F[Unit] =
+  def deleteTopic[F[_]: Async](topic: String)(implicit config: C): F[Unit] =
     withAdminClient((adminClient: KafkaAdminClient[F]) => adminClient.deleteTopic(topic))
 
-  def deleteTopics[F[_]: Applicative: Async](topics: List[String])(implicit config: C): F[Unit] =
+  def deleteTopics[F[_]: Async](topics: List[String])(implicit config: C): F[Unit] =
     withAdminClient((adminClient: KafkaAdminClient[F]) => adminClient.deleteTopics(topics))
 
-  protected def withAdminClient[F[_]: Applicative: Async, T](
+  protected def withAdminClient[F[_]: Async, T](
     body: KafkaAdminClient[F] => T
   )(implicit config: C): F[T] =
     KafkaAdminClient.stream[F](AdminClientSettings(config.bootstrapServer)).map(body).compile.lastOrError

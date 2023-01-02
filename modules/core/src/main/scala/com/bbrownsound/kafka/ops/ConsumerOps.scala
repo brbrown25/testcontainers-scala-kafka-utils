@@ -7,6 +7,7 @@ import fs2.Chunk
 import fs2.kafka._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 
+import scala.collection.compat._
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.duration.FiniteDuration
 
@@ -157,14 +158,14 @@ trait UnsafeConsumerOps extends ConsumerOps {
 }
 
 trait ConsumerOps {
-  def consumeFirstStringMessageFrom[F[_]: Applicative: Async](
+  def consumeFirstStringMessageFrom[F[_]: Async](
     topic: String,
     autoCommit: Boolean = false,
     timeout: FiniteDuration = 5.seconds
   )(implicit config: C, R: Reducible[Set]): F[String] =
     consumeNumberStringMessagesFrom[F](topic, 1, autoCommit, timeout).map(_.head)
 
-  def consumeNumberStringMessagesFrom[F[_]: Applicative: Async](
+  def consumeNumberStringMessagesFrom[F[_]: Async](
     topic: String,
     number: Int,
     autoCommit: Boolean = false,
@@ -172,7 +173,7 @@ trait ConsumerOps {
   )(implicit config: C, R: Reducible[Set]): F[List[String]] =
     consumeNumberMessagesFrom[F, String](topic, number, autoCommit, timeout)
 
-  def consumeFirstMessageFrom[F[_]: Applicative: Async, V](
+  def consumeFirstMessageFrom[F[_]: Async, V](
     topic: String,
     autoCommit: Boolean = false,
     timeout: FiniteDuration = 5.seconds
@@ -183,7 +184,7 @@ trait ConsumerOps {
   ): F[V] =
     consumeNumberMessagesFrom[F, V](topic, 1, autoCommit, timeout).map(_.head)
 
-  def consumeFirstKeyedMessageFrom[F[_]: Applicative: Async, K, V](
+  def consumeFirstKeyedMessageFrom[F[_]: Async, K, V](
     topic: String,
     autoCommit: Boolean = false,
     timeout: FiniteDuration = 5.seconds
@@ -194,7 +195,7 @@ trait ConsumerOps {
     R: Reducible[Set]
   ): F[(K, V)] = consumeNumberKeyedMessagesFrom[F, K, V](topic, 1, autoCommit, timeout).map(_.head)
 
-  def consumeNumberMessagesFrom[F[_]: Applicative: Async, V](
+  def consumeNumberMessagesFrom[F[_]: Async, V](
     topic: String,
     number: Int,
     autoCommit: Boolean = false,
@@ -206,7 +207,7 @@ trait ConsumerOps {
   ): F[List[V]] =
     consumeNumberMessagesFromTopics[F, V](Set(topic), number, autoCommit, timeout).map(_.values.toList.flatten)
 
-  def consumeNumberKeyedMessagesFrom[F[_]: Applicative: Async, K, V](
+  def consumeNumberKeyedMessagesFrom[F[_]: Async, K, V](
     topic: String,
     number: Int,
     autoCommit: Boolean = false,
@@ -224,7 +225,7 @@ trait ConsumerOps {
       timeout
     ).map(_.values.toList.flatten)
 
-  def consumeNumberMessagesFromTopics[F[_]: Applicative: Async, V](
+  def consumeNumberMessagesFromTopics[F[_]: Async, V](
     topics: Set[String],
     number: Int,
     autoCommit: Boolean = false,
@@ -245,7 +246,7 @@ trait ConsumerOps {
         .toMap
     )
 
-  def consumeNumberKeyedMessagesFromTopics[F[_]: Applicative: Async, K, V](
+  def consumeNumberKeyedMessagesFromTopics[F[_]: Async, K, V](
     topics: Set[String],
     number: Int,
     autoCommit: Boolean = false,
@@ -282,7 +283,7 @@ trait ConsumerOps {
       .lastOrError
   }
 
-  private def handleCommit[F[_]: Applicative: Async, V, K](
+  private def handleCommit[F[_]: Async, V, K](
     autoCommit: Boolean,
     c: fs2.Stream[F, (Map[String, List[(K, V)]], CommittableOffset[F])]
   ): fs2.Stream[F, Chunk[Map[String, List[(K, V)]]]] =
@@ -294,7 +295,7 @@ trait ConsumerOps {
       c.map(r => Chunk(r._1))
     }
 
-  def withConsumer[F[_]: Applicative: Async, K, V, T](body: KafkaConsumer[F, K, V] => T)(
+  def withConsumer[F[_]: Async, K, V, T](body: KafkaConsumer[F, K, V] => T)(
     implicit config: C,
     keyDeserializer: Deserializer[F, K],
     valueDeserializer: Deserializer[F, V]

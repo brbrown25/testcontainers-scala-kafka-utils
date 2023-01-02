@@ -1,9 +1,12 @@
 package com.bbrownsound.kafka.ops
 
-import cats.Applicative
 import cats.effect._
-import cats.syntax.all._
-import fs2.kafka._
+import cats.implicits._
+import fs2.kafka.KafkaProducer
+import fs2.kafka.ProducerRecord
+import fs2.kafka.ProducerRecords
+import fs2.kafka.ProducerSettings
+import fs2.kafka.Serializer
 
 import com.bbrownsound.kafka.types._
 
@@ -106,7 +109,7 @@ trait ProducerOps {
    * @tparam V
    * @return
    */
-  def publishToKafka[F[_]: Applicative: Async, K, V](topic: String, key: K, message: V)(
+  def publishToKafka[F[_]: Async, K, V](topic: String, key: K, message: V)(
     implicit config: C,
     keySerializer: Serializer[F, K],
     serializer: Serializer[F, V]
@@ -147,7 +150,7 @@ trait ProducerOps {
    * @tparam V
    * @return
    */
-  def publishToKafka[F[_]: Applicative: Async, K, V](topic: String, messages: Seq[(K, V)])(
+  def publishToKafka[F[_]: Async, K, V](topic: String, messages: Seq[(K, V)])(
     implicit config: C,
     keySerializer: Serializer[F, K],
     serializer: Serializer[F, V]
@@ -162,7 +165,7 @@ trait ProducerOps {
     }
     publishToKafka(
       KafkaProducer.stream(settings),
-      ProducerRecords(records)
+      ProducerRecords(records.toList)
     )
   }
 
@@ -178,7 +181,7 @@ trait ProducerOps {
    * @tparam T
    * @return
    */
-  def withProducer[F[_]: Applicative: Async, K, V, T](body: KafkaProducer.Metrics[F, K, V] => T)(
+  def withProducer[F[_]: Async, K, V, T](body: KafkaProducer.Metrics[F, K, V] => T)(
     implicit config: C,
     keySerializer: Serializer[F, K],
     valueSerializer: Serializer[F, V]
