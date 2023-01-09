@@ -4,7 +4,7 @@ object Dependencies {
   object Versions {
     val cats              = "2.8.0"
     val catsEffect        = "3.3.14"
-    val fs2               = "3.2.4"
+    val fs2               = "3.2.14"
     val fs2Kafka          = "2.5.0"
     val kafkaClients      = "3.3.1"
     val munit             = "0.7.29"
