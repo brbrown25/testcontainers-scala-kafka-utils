@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   object Versions {
     val cats              = "2.9.0"
-    val catsEffect        = "3.4.5"
+    val catsEffect        = "3.4.4"
     val fs2               = "3.2.14"
     val fs2Kafka          = "2.5.0"
     val kafkaClients      = "3.3.1"
